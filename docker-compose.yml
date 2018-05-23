@@ -1,17 +1,26 @@
 version: '2'
 
 services:
-  
+
   base:
     build: .
-    image: developmentseed/ifrc-go-api:latest
+    image: ifrcgo/go-api:latest
+    ports:
+      - 8080:8080
     entrypoint: /bin/bash
     env_file: .env
     volumes:
       - '.:/home/ifrc/work'
 
+  db:
+    image: 'mdillon/postgis:9.6'
+    ports:
+      - 5433:5432
+    environment:
+      - POSTGRES_USER=postgres
+
   test:
-    image: developmentseed/ifrc-go-api:latest
+    image: ifrcgo/go-api:latest
     working_dir: /home/ifrc/work
     entrypoint: bash -c './manage.py migrate; ./manage.py test'
     env_file: .env
@@ -19,7 +28,7 @@ services:
       - '.:/home/ifrc/work'
 
   manage:
-    image: developmentseed/ifrc-go-api:latest
+    image: ifrcgo/go-api:latest
     working_dir: /home/ifrc/work
     entrypoint: ./manage.py
     env_file: .env
@@ -27,7 +36,7 @@ services:
       - '.:/home/ifrc/work'
 
   server:
-    image: developmentseed/ifrc-go-api:latest
+    image: ifrcgo/go-api:latest
     entrypoint: runserver.sh
     env_file: .env
     ports:
